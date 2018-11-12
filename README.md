@@ -1,2 +1,1 @@
-# deep_learning_study
-## jupyter notebook
+## deep_learning_study - using jupyter notebook
