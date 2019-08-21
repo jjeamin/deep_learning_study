@@ -1,1 +1,5 @@
-## deep_learning_study - using jupyter notebook
+## 딥러닝 도서 공부
+- 3분 딥러닝
+- 러닝 텐서플로우
+- 밑바닥 부터 시작하는 딥러닝
++ 핸즈온 
