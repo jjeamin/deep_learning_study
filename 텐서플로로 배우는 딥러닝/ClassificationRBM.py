@@ -73,11 +73,17 @@ def gibbs_sample(k,x_k,y_k):
     return x_out,y_out
 
 ## CD-2 알고리즘
-x_s,y_s = gibbs_sample(2,x,y) # 새로운 입력값
-act_h_s = tf.sigmoid(tf.matmul(x_s,W_xh) + tf.matmul(y_s,tf.transpose(W_hy)) + b_h) # 새로운 은닉노드값
-act_h = tf.sigmoid(tf.matmul(x,W_xh) + tf.matmul(y,tf.transpose(W_hy)) + b_h) # 은닉노드값
-_x = binary(tf.sigmoid(tf.matmul(act_h,tf.transpose(W_xh)) + b_i)) # 은닉노드값이 주어질때 입력값
+# 새로운 입력값
+x_s,y_s = gibbs_sample(2,x,y) 
+# 새로운 입력값으로 새로운 은닉노드값 구하기
+act_h_s = tf.sigmoid(tf.matmul(x_s,W_xh) + tf.matmul(y_s,tf.transpose(W_hy)) + b_h) 
+# 입력값으로 은닉노드값 구하기
+act_h = tf.sigmoid(tf.matmul(x,W_xh) + tf.matmul(y,tf.transpose(W_hy)) + b_h) 
+# 은닉노드값이 주어질때 입력값을 추출
+_x = binary(tf.sigmoid(tf.matmul(act_h,tf.transpose(W_xh)) + b_i)) 
 
+
+# 가중치와 편향을 업데이트 한다.
 W_xh_add = tf.multiply(lr/batch_size,tf.subtract(tf.matmul(tf.transpose(x),act_h), tf.matmul(tf.transpose(x_s),act_h_s)))
 W_hy_add = tf.multiply(lr/batch_size,tf.subtract(tf.matmul(tf.transpose(act_h),y), tf.matmul(tf.transpose(act_h_s),y_s)))
 bi_add = tf.multiply(lr/batch_size, tf.reduce_sum(tf.subtract(x,x_s),0,True))
@@ -86,6 +92,7 @@ by_add = tf.multiply(lr/batch_size, tf.reduce_sum(tf.subtract(y,y_s),0,True))
 
 updt = [W_xh.assign_add(W_xh_add),W_hy.assign_add(W_hy_add),b_i.assign_add(bi_add),b_h.assign_add(bh_add),b_y.assign_add(by_add)]
 
+# 텐서플로우 그래프를 실행시킨다.
 with tf.Session() as sess:
     init = tf.global_variables_initializer()
     sess.run(init)
@@ -104,7 +111,8 @@ with tf.Session() as sess:
             print("Epoch:",'%04d'%(epoch+10))
 
     print("Discriminative RBM training Completed !")
-
+    
+    # 훈련데이터 정확도 계산
     tr_lab1 = np.zeros((len(trX),n_class)); tr_lab1[:,0] = 1
     tr_lab2 = np.zeros((len(trX),n_class)); tr_lab2[:,1] = 1
     tr_lab3 = np.zeros((len(trX),n_class)); tr_lab3[:,2] = 1
@@ -124,6 +132,7 @@ with tf.Session() as sess:
 
     print("Training Accuracy:",sess.run(tr_accuracy))
 
+    # 검증데이터 정확도 계산
     te_lab1 = np.zeros((len(teX),n_class)); te_lab1[:,0] = 1
     te_lab2 = np.zeros((len(teX),n_class)); te_lab2[:,1] = 1
     te_lab3 = np.zeros((len(teX),n_class)); te_lab3[:,2] = 1
